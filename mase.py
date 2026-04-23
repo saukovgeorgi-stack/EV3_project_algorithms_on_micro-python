@@ -18,6 +18,14 @@ def get_distances():
     dis_r = us_r.distance()
     dis_l = us_l.distance()
     return dis_f, dis_r, dis_l
+
+def pid(): #simple PID-controller
+    error = dis_r - target
+    motor_r.run(target)
+    motor_l.run(target)
+target = 0
+error = 0
+
 while True:
     dis_f, dis_r, dis_l = get_distances() #this function is not optimised, but now it's OK
 
@@ -26,6 +34,11 @@ while True:
         motor_r.run_angle(600, 250, wait=True) #the turning angle depends on your wheels, so choose it to suit yourself
         print("left turning")
         break
+    elif target == 0:
+        target = dis_r
+    elif dis_r < target-2 or dis_r > target+2:
+        pid()
+        print("pid")
     else:
         motor_r.run(500)
         motor_l.run(500)
