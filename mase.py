@@ -24,9 +24,11 @@ def get_distances():
     if dis_l == 2550: dis_l = 9999
     return dis_f, dis_r, dis_l
 
-def moving():
-    motor_r.run_angle(500, 360, wait=False)
-    motor_l.run_angle(500, 360, wait=True)
+def moving(multiplier):
+    motor_r.stop()
+    motor_l.stop()
+    motor_r.run_angle(700, 360*multiplier, wait=False)
+    motor_l.run_angle(700, 360*multiplier, wait=True)
     motor_l.stop()
     motor_r.stop()
 
@@ -34,15 +36,15 @@ def pid(): #simple PID-controller
     global last_error, error, attempt_count, state, target, dis_r, dis_l
 
     error = dis_r - target
-    if error > last_error + 15 or error < last_error -15 or error > 100:
-        if attempt_count > 1:
-            moving()
+    if error > last_error-15 or error > 150:
+        if attempt_count > 2:
+            moving(0.8)
             wait(10)
             print("moving_pid")
-            motor_l.run_angle(600, 260, wait=False) #(speed, angle, wait)
-            motor_r.run_angle(600, -260, wait=True) #the turning angle depends on your wheels, so choose it to suit yourself
+            motor_l.run_angle(600, 270, wait=False) #(speed, angle, wait)
+            motor_r.run_angle(600, -270, wait=True) #the turning angle depends on your wheels, so choose it to suit yourself
             print("right turning")
-            moving()
+            moving(1)
             print("moving_pid")
             rollback()
             wait(10)
@@ -51,8 +53,8 @@ def pid(): #simple PID-controller
     else:
         attempt_count = 0 #attempt_count reset: we don't use rollback because can reset all settings
 
-        motor_r.run(400-(error*4))
-        motor_l.run(400+(error*4))
+        motor_r.run(600-(error*5))
+        motor_l.run(600+(error*5))
         print("pid", attempt_count)
     last_error = error
 
@@ -75,9 +77,12 @@ state = 0
 while True:
     dis_f, dis_r, dis_l = get_distances() #this function is not optimised, but now it's OK
 
-    if dis_f <= 100: #distance is in mm so it's 10 cm
-        motor_l.run_angle(400, -300, wait=False) #(speed, angle, wait)
-        motor_r.run_angle(400, 300, wait=True) #the turning angle depends on your wheels, so choose it to suit yourself
+    if dis_f <= 90: #distance is in mm so it's 10 cm
+        motor_r.hold()
+        motor_l.hold() #hold is very strong stop
+        wait(100)
+        motor_l.run_angle(600, -270, wait=False) #(speed, angle, wait)
+        motor_r.run_angle(600, 270, wait=True) #the turning angle depends on your wheels, so choose it to suit yourself
         print("left turning")
         wait(10)
         motor_l.stop()
@@ -85,7 +90,7 @@ while True:
         wait(10)
         rollback()
     elif target == 0:
-        target = dis_r
+        target = 100 if dist_r == 9999 else dist_r
     else:
         pid()
 
