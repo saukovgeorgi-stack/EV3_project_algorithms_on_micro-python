@@ -36,9 +36,9 @@ def pid(): #simple PID-controller
     global last_error, error, attempt_count, state, target, dis_r, dis_l
 
     error = dis_r - target
-    if error > last_error-15 or error > 150:
+    if error > last_error+15 or error > 150:
         if attempt_count > 2:
-            moving(0.8)
+            moving(1.2)
             wait(10)
             print("moving_pid")
             motor_l.run_angle(600, 270, wait=False) #(speed, angle, wait)
@@ -55,7 +55,6 @@ def pid(): #simple PID-controller
 
         motor_r.run(600-(error*5))
         motor_l.run(600+(error*5))
-        print("pid", attempt_count)
     last_error = error
 
 def rollback(): #function to reset all temporary variables 
@@ -90,7 +89,7 @@ while True:
         wait(10)
         rollback()
     elif target == 0:
-        target = 100 if dist_r == 9999 else dist_r
+        target = 100 if dis_r == 9999 else dis_r
     else:
         pid()
 
