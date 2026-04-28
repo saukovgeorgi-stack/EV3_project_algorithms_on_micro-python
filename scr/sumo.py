@@ -11,6 +11,8 @@ class Sumo:
         self.us_l = UltrasonicSensor(Port.S4) #adjust these values depending on the robot's ports
         self.us_r = UltrasonicSensor(Port.S3)
 
+        self.color = ColorSensor(Port.S1)
+
         self.motor_l = Motor(Port.C)
         self.motor_r = Motor(Port.B)
 
@@ -21,20 +23,35 @@ class Sumo:
         dist = self.us_f.distance()
         return dist
     
+    def read_color(self):
+        reflection = self.color.reflection()
+        return reflection
+    
     def searching(self):
         self.motor_l.dc(80*self.search_dir)
         self.motor_r.dc(80*-self.search_dir)
 
         dist_f = self.read_front()
+        reflection = self.read_color()
 
         if dist_f <= 700:
             self.motor_l.brake()
             self.motor_r.brake()
-
             self.state = "PERSECUTION"
+
+        if reflection > 70:
+            self.motor_l.brake()
+            self.motor_r.brake()
+            self.state = "BACKOFF"
 
     def persecution(self):
         dist_f = self.read_front()
+        reflection = self.read_color()
+
+        if reflection > 70:
+            self.motor_l.brake()
+            self.motor_r.brake()
+            self.state = "BACKOFF"
 
         if dist_f < 250:
             self.state = "ATTACK"
@@ -58,9 +75,21 @@ class Sumo:
         self.motor_r.dc(80)
 
         dist_f = self.us_f.distance()
+        reflection = self.read_color()
 
         if dist_f > 700:
+            self.motor_l.brake()
+            self.motor_r.brake()
             self.state = "SEARCHING"
+        if reflection > 70:
+            self.motor_l.brake()
+            self.motor_r.brake()
+            self.state = "BACKOFF"
+
+    def back_off(self):
+        self.motor_l.run_angle(-900, 360, wait=False)
+        self.motor_r.run_angle(-900, 360, wait=True)
+        self.state = "SEARCHING"
 
     def run(self):
         self.ev3.speaker.beep()
@@ -72,11 +101,17 @@ class Sumo:
                 self.persecution()
             elif self.state == "ATTACK":
                 self.attack()
+            elif self.state == "BACKOFF":
+                self.back_off()
+            
 
             wait(10)
 
 try:
     if __name__ == "__main__":
-        Sumo()
-except KeyboardInterrupt
-
+        roboot = Sumo()
+        roboot.run()
+except KeyboardInterrupt:
+    print("the match was stopped by the user")
+except Exception as e:
+    print("critical error: e")
