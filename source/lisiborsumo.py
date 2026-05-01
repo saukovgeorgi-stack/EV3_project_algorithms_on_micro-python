@@ -5,8 +5,8 @@ from pybricks.parameters import Port
 from pybricks.tools import wait
 
 #constans
-ATTACK_SPEED = 1100
-SEARCH_SPEED = 900
+ATTACK_SPEED = -1100
+SEARCH_SPEED = -900
 
 ev3 = EV3Brick()
 
@@ -24,7 +24,7 @@ def moving(speed):
 
 first_c = False
 
-axis.run_angle(900, -220, wait=True)
+axis.run_angle(SEARCH_SPEED, -220, wait=True)
 
 while True:
     ds_f = us_f.distance()
@@ -36,16 +36,15 @@ while True:
             motor_r.hold()
             motor_l.hold()
         elif ds_r < 700:
-            motor_l.run(900)
-            motor_r.run(-900)
+            motor_l.run(SEARCH_SPEED)
+            motor_r.run(-SEARCH_SPEED)
         else:
-            motor_l.run(-900)
-            motor_r.run(900)
+            motor_l.run(-SEARCH_SPEED)
+            motor_r.run(SEARCH_SPEED)
         first_c = True
 
     elif ds_f <= 700:
-        moving(1300)
+        moving(ATTACK_SPEED)
     else:
-        motor_r.run(-900)
-        motor_l.run(900)
-    
+        motor_r.run(-SEARCH_SPEED)
+        motor_l.run(SEARCH_SPEED)

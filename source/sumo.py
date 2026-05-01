@@ -35,15 +35,15 @@ while True:
             motor_r.hold()
             motor_l.hold()
         elif ds_r < 700:
-            motor_l.run(900)
-            motor_r.run(-900)
+            motor_l.run(SEARCH_SPEED)
+            motor_r.run(-SEARCH_SPEED)
         else:
-            motor_l.run(-900)
-            motor_r.run(900)
+            motor_l.run(-SEARCH_SPEED)
+            motor_r.run(SEARCH_SPEED)
         first_c = True
 
     elif ds_f <= 700:
-        moving(1300)
+        moving(ATTACK_SPEED)
     else:
-        motor_r.run(-900)
-        motor_l.run(900)
+        motor_r.run(-SEARCH_SPEED)
+        motor_l.run(SEARCH_SPEED)
