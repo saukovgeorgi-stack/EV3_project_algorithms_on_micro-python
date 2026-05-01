@@ -8,9 +8,9 @@ ev3 = EV3Brick()
 motor_r = Motor(Port. D)
 motor_l = Motor(Port. C)
 
-us_f = 1
-us_r = 2
-us_l = 3
+us_f = UltrasonicSensor(Port. S2)
+us_r = UltrasonicSensor(Port. S3)
+us_l = UltrasonicSensor(Port. S4)
 
 firstly = False
 while True:
