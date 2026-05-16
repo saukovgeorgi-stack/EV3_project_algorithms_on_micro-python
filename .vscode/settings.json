@@ -1,0 +1,3 @@
+{
+    "ev3devBrowser.download.exclude": "{.venv/**,.github/**,.git/**,LICENSE,README.md,requirements.txt,.*}"
+}
